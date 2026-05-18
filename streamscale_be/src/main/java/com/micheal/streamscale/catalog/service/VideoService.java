@@ -69,6 +69,13 @@ public class VideoService {
         videoRepository.delete(video);
     }
 
+    public List<VideoResponse> getAllForAdmin() {
+        return videoRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     public List<VideoResponse> getPublishedVideos() {
         return videoRepository.findByStatusOrderByCreatedAtDesc(VideoStatus.PUBLISHED)
                 .stream()

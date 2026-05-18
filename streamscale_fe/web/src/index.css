@@ -286,6 +286,114 @@ form {
   max-width: 480px;
 }
 
+.admin-page--list {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.admin-page__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-page__toolbar h1 {
+  margin: 0;
+}
+
+.admin-page__link-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-page__link-btn:hover {
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.admin-page__hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-table-section {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.admin-table-section h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.admin-table th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.admin-table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin-table__actions button {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+}
+
+.admin-btn-secondary {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.admin-btn-danger {
+  background: #5c1a1a;
+}
+
+.admin-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.admin-badge--draft {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.admin-badge--published {
+  background: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+}
+
 fieldset {
   border: 1px solid var(--border);
   border-radius: 4px;

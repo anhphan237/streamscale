@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom
 import AdminRoute from '../components/AdminRoute';
 import ProtectedRoute from '../components/ProtectedRoute';
 import AdminVideoCreatePage from '../pages/AdminVideoCreatePage';
+import AdminVideoListPage from '../pages/AdminVideoListPage';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import ProfileSelectionPage from '../pages/ProfileSelectionPage';
@@ -32,6 +33,7 @@ export default function AppRouter() {
         </Route>
 
         <Route element={<AdminRoute />}>
+          <Route path="/admin/videos" element={<AdminVideoListPage />} />
           <Route path="/admin/videos/new" element={<AdminVideoCreatePage />} />
         </Route>
 

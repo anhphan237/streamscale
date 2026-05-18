@@ -8,12 +8,19 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin/videos")
 @RequiredArgsConstructor
 public class AdminVideoController {
 
     private final VideoService videoService;
+
+    @GetMapping
+    public List<VideoResponse> getAll() {
+        return videoService.getAllForAdmin();
+    }
 
     @PostMapping
     public VideoResponse create(@Valid @RequestBody VideoCreateRequest request) {

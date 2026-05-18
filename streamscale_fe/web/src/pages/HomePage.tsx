@@ -47,7 +47,7 @@ export default function HomePage() {
         <VideoRow title="Trending" videos={trending} />
         {!hasAny && (
           <p className="home-page__empty">
-            <Link to="/admin/videos/new">Go to Admin → Create video</Link>
+            <Link to="/admin/videos">Go to Admin → Manage videos</Link>
           </p>
         )}
       </main>

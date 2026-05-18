@@ -26,7 +26,7 @@ export default function AppHeader() {
       </Link>
       <div className="app-header__actions">
         <Link to="/profiles">Profiles</Link>
-        {role === 'ADMIN' && <Link to="/admin/videos/new">Admin</Link>}
+        {role === 'ADMIN' && <Link to="/admin/videos">Admin</Link>}
         <button type="button" onClick={logout}>
           Sign out
         </button>

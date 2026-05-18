@@ -10,6 +10,8 @@ export const videoApi = {
 
   getTrending: () => axiosClient.get<Video[]>('/api/videos/trending'),
 
+  getAllAdmin: () => axiosClient.get<Video[]>('/api/admin/videos'),
+
   create: (data: VideoCreateRequest) =>
     axiosClient.post<Video>('/api/admin/videos', data),
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { genreApi } from '../api/genreApi';
 import { videoApi } from '../api/videoApi';
 import AppHeader from '../components/AppHeader';
@@ -62,6 +63,9 @@ export default function AdminVideoCreatePage() {
     <>
       <AppHeader />
       <main className="admin-page">
+        <p>
+          <Link to="/admin/videos">← Back to video list</Link>
+        </p>
         <h1>Create video</h1>
       <form onSubmit={handleSubmit}>
         <label>
