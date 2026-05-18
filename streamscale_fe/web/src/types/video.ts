@@ -19,6 +19,18 @@ export interface Video {
   genres: Genre[];
 }
 
+export interface VideoUpdateRequest {
+  title?: string;
+  description?: string;
+  type?: VideoType;
+  status?: VideoStatus;
+  thumbnailUrl?: string;
+  trailerUrl?: string;
+  durationSeconds?: number;
+  releaseYear?: number;
+  genreIds?: number[];
+}
+
 export interface VideoCreateRequest {
   title: string;
   description?: string;

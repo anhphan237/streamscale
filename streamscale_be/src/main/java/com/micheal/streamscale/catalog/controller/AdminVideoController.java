@@ -22,6 +22,11 @@ public class AdminVideoController {
         return videoService.getAllForAdmin();
     }
 
+    @GetMapping("/{id}")
+    public VideoResponse getById(@PathVariable Long id) {
+        return videoService.getByIdForAdmin(id);
+    }
+
     @PostMapping
     public VideoResponse create(@Valid @RequestBody VideoCreateRequest request) {
         return videoService.create(request);

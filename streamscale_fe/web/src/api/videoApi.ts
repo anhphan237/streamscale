@@ -1,5 +1,5 @@
 import axiosClient from './axiosClient';
-import type { Video, VideoCreateRequest } from '../types/video';
+import type { Video, VideoCreateRequest, VideoUpdateRequest } from '../types/video';
 
 export const videoApi = {
   getVideos: () => axiosClient.get<Video[]>('/api/videos'),
@@ -12,10 +12,13 @@ export const videoApi = {
 
   getAllAdmin: () => axiosClient.get<Video[]>('/api/admin/videos'),
 
+  getAdminDetail: (id: number) =>
+    axiosClient.get<Video>(`/api/admin/videos/${id}`),
+
   create: (data: VideoCreateRequest) =>
     axiosClient.post<Video>('/api/admin/videos', data),
 
-  update: (id: number, data: Partial<VideoCreateRequest>) =>
+  update: (id: number, data: VideoUpdateRequest) =>
     axiosClient.put<Video>(`/api/admin/videos/${id}`, data),
 
   delete: (id: number) => axiosClient.delete(`/api/admin/videos/${id}`),

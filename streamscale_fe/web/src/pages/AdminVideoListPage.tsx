@@ -159,6 +159,12 @@ function VideoAdminTable({
                 </span>
               </td>
               <td className="admin-table__actions">
+                <Link
+                  to={`/admin/videos/${video.id}/edit`}
+                  className="admin-page__link-btn admin-btn-edit"
+                >
+                  Edit
+                </Link>
                 {!published && onPublish && (
                   <button
                     type="button"

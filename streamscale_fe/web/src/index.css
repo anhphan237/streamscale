@@ -376,6 +376,18 @@ form {
   background: #5c1a1a;
 }
 
+.admin-btn-edit {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.admin-btn-edit:hover {
+  text-decoration: none;
+  opacity: 0.9;
+}
+
 .admin-badge {
   display: inline-block;
   padding: 0.2rem 0.5rem;

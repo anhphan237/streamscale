@@ -74,6 +74,13 @@ public class VideoService {
     }
 
     @Transactional(readOnly = true)
+    public VideoResponse getByIdForAdmin(Long id) {
+        Video video = videoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Video not found"));
+        return toResponse(video);
+    }
+
+    @Transactional(readOnly = true)
     public List<VideoResponse> getAllForAdmin() {
         return videoRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
