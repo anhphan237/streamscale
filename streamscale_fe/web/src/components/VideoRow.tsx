@@ -4,9 +4,10 @@ import VideoCard from './VideoCard';
 interface VideoRowProps {
   title: string;
   videos: Video[];
+  onOpenVideo?: (video: Video) => void;
 }
 
-export default function VideoRow({ title, videos }: VideoRowProps) {
+export default function VideoRow({ title, videos, onOpenVideo }: VideoRowProps) {
   if (videos.length === 0) return null;
 
   return (
@@ -14,7 +15,7 @@ export default function VideoRow({ title, videos }: VideoRowProps) {
       <h2 className="video-row__title">{title}</h2>
       <div className="video-row__list">
         {videos.map((video) => (
-          <VideoCard key={video.id} video={video} />
+          <VideoCard key={video.id} video={video} onOpen={onOpenVideo} />
         ))}
       </div>
     </section>

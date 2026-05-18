@@ -2,7 +2,13 @@ import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { profileApi } from '../api/profileApi';
-import type { Profile } from '../types/profile';
+import type { Profile, ProfileRequest } from '../types/profile';
+
+const emptyEdit: ProfileRequest = {
+  name: '',
+  avatarUrl: '',
+  isKids: false,
+};
 
 export default function ProfileSelectionPage() {
   const navigate = useNavigate();
@@ -11,18 +17,23 @@ export default function ProfileSelectionPage() {
   const [error, setError] = useState('');
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [managing, setManaging] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState<ProfileRequest>(emptyEdit);
+  const [saving, setSaving] = useState(false);
 
   const loadProfiles = () =>
     profileApi
       .getMyProfiles()
       .then((res) => setProfiles(res.data))
-      .catch(() => setError('Could not load profiles'));
+      .catch(() => setError('Không tải được profiles'));
 
   useEffect(() => {
     loadProfiles().finally(() => setLoading(false));
   }, []);
 
   const selectProfile = (profile: Profile) => {
+    if (managing) return;
     localStorage.setItem('selectedProfileId', String(profile.id));
     navigate('/');
   };
@@ -37,9 +48,52 @@ export default function ProfileSelectionPage() {
       setNewName('');
       await loadProfiles();
     } catch {
-      setError('Could not create profile');
+      setError('Không tạo được profile');
     } finally {
       setCreating(false);
+    }
+  };
+
+  const startEdit = (profile: Profile) => {
+    setEditingId(profile.id);
+    setEditForm({
+      name: profile.name,
+      avatarUrl: profile.avatarUrl ?? '',
+      isKids: profile.isKids,
+    });
+  };
+
+  const handleUpdate = async (e: FormEvent) => {
+    e.preventDefault();
+    if (editingId == null) return;
+    setSaving(true);
+    setError('');
+    try {
+      await profileApi.update(editingId, {
+        name: editForm.name.trim(),
+        avatarUrl: editForm.avatarUrl || undefined,
+        isKids: editForm.isKids,
+      });
+      setEditingId(null);
+      await loadProfiles();
+    } catch {
+      setError('Không cập nhật được profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (profile: Profile) => {
+    if (!window.confirm(`Xóa profile "${profile.name}"?`)) return;
+    setError('');
+    try {
+      await profileApi.delete(profile.id);
+      if (localStorage.getItem('selectedProfileId') === String(profile.id)) {
+        localStorage.removeItem('selectedProfileId');
+      }
+      await loadProfiles();
+    } catch {
+      setError('Không xóa được profile');
     }
   };
 
@@ -50,48 +104,139 @@ export default function ProfileSelectionPage() {
     navigate('/login');
   };
 
-  if (loading) return <main className="profile-page">Loading…</main>;
+  if (loading) return <main className="profile-page">Đang tải…</main>;
 
   return (
     <main className="profile-page">
-      <h1>Who&apos;s watching?</h1>
+      <h1>{managing ? 'Quản lý profiles' : 'Ai đang xem?'}</h1>
+      <p className="profile-page__hint">
+        {managing
+          ? 'Sửa hoặc xóa profile. Bấm Done để quay lại chọn profile.'
+          : 'Chọn profile để vào StreamScale.'}
+      </p>
+
       {error && <p className="auth-page__error">{error}</p>}
+
+      <button
+        type="button"
+        className="profile-page__manage-toggle"
+        onClick={() => {
+          setManaging((m) => !m);
+          setEditingId(null);
+        }}
+      >
+        {managing ? 'Done' : 'Manage Profiles'}
+      </button>
+
       <div className="profile-page__grid">
         {profiles.map((profile) => (
-          <button
-            key={profile.id}
-            type="button"
-            className="profile-page__card"
-            onClick={() => selectProfile(profile)}
-          >
-            {profile.avatarUrl ? (
-              <img src={profile.avatarUrl} alt="" />
-            ) : (
-              <span className="profile-page__avatar">{profile.name[0]}</span>
+          <div key={profile.id} className="profile-page__item">
+            <button
+              type="button"
+              className="profile-page__card"
+              onClick={() => selectProfile(profile)}
+              disabled={managing}
+            >
+              {profile.avatarUrl ? (
+                <img src={profile.avatarUrl} alt="" />
+              ) : (
+                <span className="profile-page__avatar">{profile.name[0]}</span>
+              )}
+              <span>{profile.name}</span>
+              {profile.isKids && (
+                <span className="profile-page__badge">Kids</span>
+              )}
+            </button>
+            {managing && (
+              <div className="profile-page__item-actions">
+                <button type="button" onClick={() => startEdit(profile)}>
+                  Sửa
+                </button>
+                <button
+                  type="button"
+                  className="profile-page__delete"
+                  onClick={() => handleDelete(profile)}
+                >
+                  Xóa
+                </button>
+              </div>
             )}
-            <span>{profile.name}</span>
-          </button>
+          </div>
         ))}
       </div>
-      <div className="profile-page__create">
-        <form onSubmit={handleCreate}>
-          <label>
-            Add profile
-            <input
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder="Profile name"
-              required
-            />
-          </label>
-          <button type="submit" disabled={creating}>
-            {creating ? 'Adding…' : 'Add profile'}
-          </button>
-        </form>
-      </div>
+
+      {managing && editingId != null && (
+        <div className="profile-page__edit panel">
+          <h2>Sửa profile</h2>
+          <form onSubmit={handleUpdate}>
+            <label>
+              Tên
+              <input
+                value={editForm.name}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, name: e.target.value })
+                }
+                required
+              />
+            </label>
+            <label>
+              Avatar URL
+              <input
+                value={editForm.avatarUrl ?? ''}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, avatarUrl: e.target.value })
+                }
+                placeholder="https://..."
+              />
+            </label>
+            <label className="profile-page__checkbox">
+              <input
+                type="checkbox"
+                checked={editForm.isKids}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, isKids: e.target.checked })
+                }
+              />
+              Kids profile
+            </label>
+            <div className="profile-page__form-actions">
+              <button type="submit" disabled={saving}>
+                {saving ? 'Đang lưu…' : 'Lưu'}
+              </button>
+              <button
+                type="button"
+                className="profile-page__cancel"
+                onClick={() => setEditingId(null)}
+              >
+                Hủy
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {!managing && (
+        <div className="profile-page__create">
+          <form onSubmit={handleCreate}>
+            <label>
+              Thêm profile
+              <input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="Tên profile"
+                required
+              />
+            </label>
+            <button type="submit" disabled={creating}>
+              {creating ? 'Đang thêm…' : 'Thêm profile'}
+            </button>
+          </form>
+        </div>
+      )}
+
       <p>
         <button type="button" onClick={logout}>
-          Sign out
+          Đăng xuất
         </button>
       </p>
     </main>
