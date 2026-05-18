@@ -26,8 +26,8 @@ export interface VideoUpdateRequest {
   status?: VideoStatus;
   thumbnailUrl?: string;
   trailerUrl?: string;
-  durationSeconds?: number;
-  releaseYear?: number;
+  durationSeconds?: number | null;
+  releaseYear?: number | null;
   genreIds?: number[];
 }
 

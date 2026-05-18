@@ -3,8 +3,9 @@ import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { genreApi } from '../api/genreApi';
 import { videoApi } from '../api/videoApi';
+import AdminVideoForm from '../components/AdminVideoForm';
 import AppHeader from '../components/AppHeader';
-import type { Genre, VideoCreateRequest, VideoStatus, VideoType } from '../types/video';
+import type { Genre, VideoCreateRequest } from '../types/video';
 
 const emptyForm: VideoCreateRequest = {
   title: '',
@@ -38,25 +39,15 @@ export default function AdminVideoCreatePage() {
       await videoApi.create(form);
       setMessage(
         form.status === 'PUBLISHED'
-          ? 'Video created — it will appear on the home page.'
-          : 'Video saved as draft — set status to Published to show on home.',
+          ? 'Đã tạo video — metadata sẽ hiện trên home.'
+          : 'Đã lưu draft — publish để hiện trên home.',
       );
       setForm(emptyForm);
     } catch {
-      setError('Failed to create video');
+      setError('Tạo video thất bại');
     } finally {
       setLoading(false);
     }
-  };
-
-  const toggleGenre = (genreId: number) => {
-    const ids = form.genreIds ?? [];
-    setForm({
-      ...form,
-      genreIds: ids.includes(genreId)
-        ? ids.filter((id) => id !== genreId)
-        : [...ids, genreId],
-    });
   };
 
   return (
@@ -64,82 +55,19 @@ export default function AdminVideoCreatePage() {
       <AppHeader />
       <main className="admin-page">
         <p>
-          <Link to="/admin/videos">← Back to video list</Link>
+          <Link to="/admin/videos">← Quay lại danh sách</Link>
         </p>
-        <h1>Create video</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Title
-          <input
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            required
-          />
-        </label>
-        <label>
-          Description
-          <textarea
-            value={form.description ?? ''}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-          />
-        </label>
-        <label>
-          Type
-          <select
-            value={form.type}
-            onChange={(e) =>
-              setForm({ ...form, type: e.target.value as VideoType })
-            }
-          >
-            <option value="MOVIE">Movie</option>
-            <option value="SERIES">Series</option>
-          </select>
-        </label>
-        <label>
-          Status
-          <select
-            value={form.status}
-            onChange={(e) =>
-              setForm({ ...form, status: e.target.value as VideoStatus })
-            }
-          >
-            <option value="DRAFT">Draft (hidden on home)</option>
-            <option value="PUBLISHED">Published (visible on home)</option>
-          </select>
-        </label>
-        <label>
-          Thumbnail URL
-          <input
-            value={form.thumbnailUrl ?? ''}
-            onChange={(e) => setForm({ ...form, thumbnailUrl: e.target.value })}
-          />
-        </label>
-        <label>
-          Trailer URL
-          <input
-            value={form.trailerUrl ?? ''}
-            onChange={(e) => setForm({ ...form, trailerUrl: e.target.value })}
-          />
-        </label>
-        <fieldset>
-          <legend>Genres</legend>
-          {genres.map((genre) => (
-            <label key={genre.id}>
-              <input
-                type="checkbox"
-                checked={form.genreIds?.includes(genre.id) ?? false}
-                onChange={() => toggleGenre(genre.id)}
-              />
-              {genre.name}
-            </label>
-          ))}
-        </fieldset>
-        {message && <p>{message}</p>}
-        {error && <p className="admin-page__error">{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Saving…' : 'Create'}
-        </button>
-        </form>
+        <h1>Tạo video mới</h1>
+        <AdminVideoForm
+          form={form}
+          genres={genres}
+          onChange={setForm}
+          onSubmit={handleSubmit}
+          loading={loading}
+          submitLabel="Tạo video"
+          message={message}
+          error={error}
+        />
       </main>
     </>
   );

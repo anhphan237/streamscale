@@ -1,17 +1,32 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
+import { isAxiosError } from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { genreApi } from '../api/genreApi';
 import { videoApi } from '../api/videoApi';
+import AdminVideoForm from '../components/AdminVideoForm';
 import AppHeader from '../components/AppHeader';
-import type { Genre, VideoCreateRequest, VideoStatus, VideoType } from '../types/video';
+import type { Genre, VideoCreateRequest } from '../types/video';
+import { toVideoUpdatePayload } from '../utils/videoPayload';
+
+const emptyForm: VideoCreateRequest = {
+  title: '',
+  description: '',
+  type: 'MOVIE',
+  status: 'PUBLISHED',
+  thumbnailUrl: '',
+  trailerUrl: '',
+  durationSeconds: undefined,
+  releaseYear: undefined,
+  genreIds: [],
+};
 
 export default function AdminVideoEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const videoId = Number(id);
 
-  const [form, setForm] = useState<VideoCreateRequest | null>(null);
+  const [form, setForm] = useState<VideoCreateRequest>(emptyForm);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -43,31 +58,22 @@ export default function AdminVideoEditPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form) return;
-
     setMessage('');
     setError('');
     setLoading(true);
     try {
-      await videoApi.update(videoId, form);
-      setMessage('Đã cập nhật video.');
+      await videoApi.update(videoId, toVideoUpdatePayload(form));
+      setMessage('Đã cập nhật metadata.');
       setTimeout(() => navigate('/admin/videos'), 800);
-    } catch {
-      setError('Cập nhật thất bại');
+    } catch (err) {
+      if (isAxiosError(err) && err.response?.status === 403) {
+        setError('Không có quyền (403). Restart backend và đăng nhập admin.');
+      } else {
+        setError('Cập nhật thất bại — kiểm tra backend đang chạy.');
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  const toggleGenre = (genreId: number) => {
-    if (!form) return;
-    const ids = form.genreIds ?? [];
-    setForm({
-      ...form,
-      genreIds: ids.includes(genreId)
-        ? ids.filter((gid) => gid !== genreId)
-        : [...ids, genreId],
-    });
   };
 
   if (pageLoading) {
@@ -79,7 +85,7 @@ export default function AdminVideoEditPage() {
     );
   }
 
-  if (error && !form) {
+  if (error && !form.title) {
     return (
       <>
         <AppHeader />
@@ -91,8 +97,6 @@ export default function AdminVideoEditPage() {
     );
   }
 
-  if (!form) return null;
-
   return (
     <>
       <AppHeader />
@@ -100,112 +104,17 @@ export default function AdminVideoEditPage() {
         <p>
           <Link to="/admin/videos">← Quay lại danh sách</Link>
         </p>
-        <h1>Edit video</h1>
-        <form onSubmit={handleSubmit}>
-          <label>
-            Title
-            <input
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            Description
-            <textarea
-              value={form.description ?? ''}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-            />
-          </label>
-          <label>
-            Type
-            <select
-              value={form.type}
-              onChange={(e) =>
-                setForm({ ...form, type: e.target.value as VideoType })
-              }
-            >
-              <option value="MOVIE">Movie</option>
-              <option value="SERIES">Series</option>
-            </select>
-          </label>
-          <label>
-            Status
-            <select
-              value={form.status}
-              onChange={(e) =>
-                setForm({ ...form, status: e.target.value as VideoStatus })
-              }
-            >
-              <option value="DRAFT">Draft (hidden on home)</option>
-              <option value="PUBLISHED">Published (visible on home)</option>
-            </select>
-          </label>
-          <label>
-            Thumbnail URL
-            <input
-              value={form.thumbnailUrl ?? ''}
-              onChange={(e) =>
-                setForm({ ...form, thumbnailUrl: e.target.value })
-              }
-            />
-          </label>
-          <label>
-            Trailer URL
-            <input
-              value={form.trailerUrl ?? ''}
-              onChange={(e) => setForm({ ...form, trailerUrl: e.target.value })}
-            />
-          </label>
-          <label>
-            Release year
-            <input
-              type="number"
-              value={form.releaseYear ?? ''}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  releaseYear: e.target.value
-                    ? Number(e.target.value)
-                    : undefined,
-                })
-              }
-            />
-          </label>
-          <label>
-            Duration (seconds)
-            <input
-              type="number"
-              value={form.durationSeconds ?? ''}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  durationSeconds: e.target.value
-                    ? Number(e.target.value)
-                    : undefined,
-                })
-              }
-            />
-          </label>
-          <fieldset>
-            <legend>Genres</legend>
-            {genres.map((genre) => (
-              <label key={genre.id}>
-                <input
-                  type="checkbox"
-                  checked={form.genreIds?.includes(genre.id) ?? false}
-                  onChange={() => toggleGenre(genre.id)}
-                />
-                {genre.name}
-              </label>
-            ))}
-          </fieldset>
-          {message && <p>{message}</p>}
-          {error && <p className="admin-page__error">{error}</p>}
-          <button type="submit" disabled={loading}>
-            {loading ? 'Saving…' : 'Save changes'}
-          </button>
-        </form>
+        <h1>Sửa metadata video</h1>
+        <AdminVideoForm
+          form={form}
+          genres={genres}
+          onChange={setForm}
+          onSubmit={handleSubmit}
+          loading={loading}
+          submitLabel="Lưu metadata"
+          message={message}
+          error={error}
+        />
       </main>
     </>
   );

@@ -34,11 +34,34 @@ export default function VideoDetailPage() {
         />
       )}
       <h1>{video.title}</h1>
-      {video.releaseYear && <p>{video.releaseYear}</p>}
-      {video.description && <p>{video.description}</p>}
-      {video.genres.length > 0 && (
-        <p>{video.genres.map((g) => g.name).join(' · ')}</p>
-      )}
+      <dl className="video-detail-page__meta">
+        <div>
+          <dt>Loại</dt>
+          <dd>{video.type === 'MOVIE' ? 'Phim' : 'Series'}</dd>
+        </div>
+        {video.releaseYear != null && (
+          <div>
+            <dt>Năm</dt>
+            <dd>{video.releaseYear}</dd>
+          </div>
+        )}
+        {video.durationSeconds != null && video.durationSeconds > 0 && (
+          <div>
+            <dt>Thời lượng</dt>
+            <dd>
+              {Math.floor(video.durationSeconds / 60)} phút{' '}
+              {video.durationSeconds % 60} giây
+            </dd>
+          </div>
+        )}
+        {video.genres.length > 0 && (
+          <div>
+            <dt>Thể loại</dt>
+            <dd>{video.genres.map((g) => g.name).join(' · ')}</dd>
+          </div>
+        )}
+      </dl>
+      {video.description && <p className="video-detail-page__desc">{video.description}</p>}
       {video.trailerUrl && (
         <a href={video.trailerUrl} target="_blank" rel="noreferrer">
           Watch trailer

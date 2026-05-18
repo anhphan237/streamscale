@@ -163,7 +163,7 @@ function VideoAdminTable({
                   to={`/admin/videos/${video.id}/edit`}
                   className="admin-page__link-btn admin-btn-edit"
                 >
-                  Edit
+                  Sửa metadata
                 </Link>
                 {!published && onPublish && (
                   <button

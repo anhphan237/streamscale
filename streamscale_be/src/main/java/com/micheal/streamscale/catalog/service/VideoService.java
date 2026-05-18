@@ -49,20 +49,39 @@ public class VideoService {
         Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Video not found"));
 
-        if (request.title() != null) video.setTitle(request.title());
-        if (request.description() != null) video.setDescription(request.description());
-        if (request.type() != null) video.setType(VideoType.valueOf(request.type()));
-        if (request.status() != null) video.setStatus(VideoStatus.valueOf(request.status()));
-        if (request.thumbnailUrl() != null) video.setThumbnailUrl(request.thumbnailUrl());
-        if (request.trailerUrl() != null) video.setTrailerUrl(request.trailerUrl());
-        if (request.durationSeconds() != null) video.setDurationSeconds(request.durationSeconds());
-        if (request.releaseYear() != null) video.setReleaseYear(request.releaseYear());
-
-        if (request.genreIds() != null) {
-            video.setGenres(getGenresByIds(request.genreIds()));
+        if (request.title() != null) {
+            applyFullMetadataUpdate(video, request);
+        } else {
+            if (request.status() != null) {
+                video.setStatus(VideoStatus.valueOf(request.status()));
+            }
         }
 
         return toResponse(videoRepository.save(video));
+    }
+
+    private void applyFullMetadataUpdate(Video video, VideoUpdateRequest request) {
+        video.setTitle(request.title());
+        if (request.description() != null) {
+            video.setDescription(request.description());
+        }
+        if (request.type() != null) {
+            video.setType(VideoType.valueOf(request.type()));
+        }
+        if (request.status() != null) {
+            video.setStatus(VideoStatus.valueOf(request.status()));
+        }
+        if (request.thumbnailUrl() != null) {
+            video.setThumbnailUrl(request.thumbnailUrl());
+        }
+        if (request.trailerUrl() != null) {
+            video.setTrailerUrl(request.trailerUrl());
+        }
+        video.setDurationSeconds(request.durationSeconds());
+        video.setReleaseYear(request.releaseYear());
+        if (request.genreIds() != null) {
+            video.setGenres(getGenresByIds(request.genreIds()));
+        }
     }
 
     @Transactional
