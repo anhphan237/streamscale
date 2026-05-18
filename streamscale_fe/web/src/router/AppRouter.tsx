@@ -25,11 +25,10 @@ export default function AppRouter() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/profiles" element={<ProfileSelectionPage />} />
-        </Route>
-
-        <Route element={<ProfileRequiredRoute />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/videos/:id" element={<VideoDetailPage />} />
+          <Route element={<ProfileRequiredRoute />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/videos/:id" element={<VideoDetailPage />} />
+          </Route>
         </Route>
 
         <Route element={<AdminRoute />}>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { videoApi } from '../api/videoApi';
+import AppHeader from '../components/AppHeader';
 import type { Video } from '../types/video';
 
 export default function VideoDetailPage() {
@@ -22,7 +23,9 @@ export default function VideoDetailPage() {
   if (error || !video) return <main className="video-detail-page">{error}</main>;
 
   return (
-    <main className="video-detail-page">
+    <>
+      <AppHeader />
+      <main className="video-detail-page">
       {video.thumbnailUrl && (
         <img
           className="video-detail-page__hero"
@@ -41,6 +44,7 @@ export default function VideoDetailPage() {
           Watch trailer
         </a>
       )}
-    </main>
+      </main>
+    </>
   );
 }

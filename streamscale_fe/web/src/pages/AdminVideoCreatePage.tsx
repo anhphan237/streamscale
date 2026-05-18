@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { genreApi } from '../api/genreApi';
 import { videoApi } from '../api/videoApi';
+import AppHeader from '../components/AppHeader';
 import type { Genre, VideoCreateRequest, VideoStatus, VideoType } from '../types/video';
 
 const emptyForm: VideoCreateRequest = {
   title: '',
   description: '',
   type: 'MOVIE',
-  status: 'DRAFT',
+  status: 'PUBLISHED',
   thumbnailUrl: '',
   trailerUrl: '',
   durationSeconds: undefined,
@@ -34,7 +35,11 @@ export default function AdminVideoCreatePage() {
     setLoading(true);
     try {
       await videoApi.create(form);
-      setMessage('Video created');
+      setMessage(
+        form.status === 'PUBLISHED'
+          ? 'Video created — it will appear on the home page.'
+          : 'Video saved as draft — set status to Published to show on home.',
+      );
       setForm(emptyForm);
     } catch {
       setError('Failed to create video');
@@ -54,8 +59,10 @@ export default function AdminVideoCreatePage() {
   };
 
   return (
-    <main className="admin-page">
-      <h1>Create video</h1>
+    <>
+      <AppHeader />
+      <main className="admin-page">
+        <h1>Create video</h1>
       <form onSubmit={handleSubmit}>
         <label>
           Title
@@ -92,8 +99,8 @@ export default function AdminVideoCreatePage() {
               setForm({ ...form, status: e.target.value as VideoStatus })
             }
           >
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
+            <option value="DRAFT">Draft (hidden on home)</option>
+            <option value="PUBLISHED">Published (visible on home)</option>
           </select>
         </label>
         <label>
@@ -128,7 +135,8 @@ export default function AdminVideoCreatePage() {
         <button type="submit" disabled={loading}>
           {loading ? 'Saving…' : 'Create'}
         </button>
-      </form>
-    </main>
+        </form>
+      </main>
+    </>
   );
 }
