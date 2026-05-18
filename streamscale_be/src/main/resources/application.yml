@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: streamscale-monolith
+
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/streamscale
+    username: streamscale
+    password: streamscale
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  secret: "streamscale-secret-key-streamscale-secret-key-123456789"
+  expiration-ms: 86400000
