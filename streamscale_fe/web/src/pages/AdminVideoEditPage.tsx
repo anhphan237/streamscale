@@ -9,24 +9,36 @@ import AppHeader from '../components/AppHeader';
 import type { Genre, VideoCreateRequest } from '../types/video';
 import { toVideoUpdatePayload } from '../utils/videoPayload';
 
-const emptyForm: VideoCreateRequest = {
-  title: '',
-  description: '',
-  type: 'MOVIE',
-  status: 'PUBLISHED',
-  thumbnailUrl: '',
-  trailerUrl: '',
-  durationSeconds: undefined,
-  releaseYear: undefined,
-  genreIds: [],
-};
+function videoToForm(video: {
+  title: string;
+  description: string | null;
+  type: VideoCreateRequest['type'];
+  status: VideoCreateRequest['status'];
+  thumbnailUrl: string | null;
+  trailerUrl: string | null;
+  durationSeconds: number | null;
+  releaseYear: number | null;
+  genres: { id: number }[];
+}): VideoCreateRequest {
+  return {
+    title: video.title,
+    description: video.description ?? '',
+    type: video.type,
+    status: video.status,
+    thumbnailUrl: video.thumbnailUrl ?? '',
+    trailerUrl: video.trailerUrl ?? '',
+    durationSeconds: video.durationSeconds ?? undefined,
+    releaseYear: video.releaseYear ?? undefined,
+    genreIds: video.genres.map((g) => g.id),
+  };
+}
 
 export default function AdminVideoEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const videoId = Number(id);
 
-  const [form, setForm] = useState<VideoCreateRequest>(emptyForm);
+  const [form, setForm] = useState<VideoCreateRequest | null>(null);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -36,28 +48,28 @@ export default function AdminVideoEditPage() {
   useEffect(() => {
     if (!id || Number.isNaN(videoId)) return;
 
-    Promise.all([videoApi.getAdminDetail(videoId), genreApi.getAll()])
-      .then(([videoRes, genresRes]) => {
-        const video = videoRes.data;
+    (async () => {
+      try {
+        const [video, genresRes] = await Promise.all([
+          videoApi.getAdminDetailOrFromList(videoId),
+          genreApi.getAll(),
+        ]);
         setGenres(genresRes.data);
-        setForm({
-          title: video.title,
-          description: video.description ?? '',
-          type: video.type,
-          status: video.status,
-          thumbnailUrl: video.thumbnailUrl ?? '',
-          trailerUrl: video.trailerUrl ?? '',
-          durationSeconds: video.durationSeconds ?? undefined,
-          releaseYear: video.releaseYear ?? undefined,
-          genreIds: video.genres.map((g) => g.id),
-        });
-      })
-      .catch(() => setError('Không tải được video'))
-      .finally(() => setPageLoading(false));
+        setForm(videoToForm(video));
+      } catch {
+        setError(
+          'Không tải được video. Restart backend (sửa SecurityConfig) rồi thử lại.',
+        );
+      } finally {
+        setPageLoading(false);
+      }
+    })();
   }, [id, videoId]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!form) return;
+
     setMessage('');
     setError('');
     setLoading(true);
@@ -67,7 +79,9 @@ export default function AdminVideoEditPage() {
       setTimeout(() => navigate('/admin/videos'), 800);
     } catch (err) {
       if (isAxiosError(err) && err.response?.status === 403) {
-        setError('Không có quyền (403). Restart backend và đăng nhập admin.');
+        setError(
+          'Lưu thất bại (403). Restart backend — pattern /api/videos/** đang chặn PUT admin.',
+        );
       } else {
         setError('Cập nhật thất bại — kiểm tra backend đang chạy.');
       }
@@ -85,7 +99,7 @@ export default function AdminVideoEditPage() {
     );
   }
 
-  if (error && !form.title) {
+  if (!form) {
     return (
       <>
         <AppHeader />

@@ -29,7 +29,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/videos/**", "/api/genres/**").authenticated()
+                        // Không dùng /api/videos/** — pattern đó match nhầm /api/admin/videos/{id}
+                        .requestMatchers(
+                                "/api/videos",
+                                "/api/videos/latest",
+                                "/api/videos/trending"
+                        ).authenticated()
+                        .requestMatchers("/api/videos/*").authenticated()
+                        .requestMatchers("/api/genres", "/api/genres/**").authenticated()
                         .requestMatchers("/api/profiles/**").authenticated()
                         .requestMatchers("/api/auth/me").authenticated()
                         .anyRequest().authenticated()

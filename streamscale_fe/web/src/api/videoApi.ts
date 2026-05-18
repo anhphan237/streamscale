@@ -15,6 +15,19 @@ export const videoApi = {
   getAdminDetail: (id: number) =>
     axiosClient.get<Video>(`/api/admin/videos/${id}`),
 
+  /** Fallback: list API khi GET by id bị chặn (backend cũ / security). */
+  getAdminDetailOrFromList: async (id: number): Promise<Video> => {
+    try {
+      const { data } = await axiosClient.get<Video>(`/api/admin/videos/${id}`);
+      return data;
+    } catch {
+      const { data: list } = await axiosClient.get<Video[]>('/api/admin/videos');
+      const found = list.find((v) => v.id === id);
+      if (!found) throw new Error('Video not found');
+      return found;
+    }
+  },
+
   create: (data: VideoCreateRequest) =>
     axiosClient.post<Video>('/api/admin/videos', data),
 
