@@ -22,11 +22,6 @@ public class VideoController {
         return videoService.getPublishedVideos();
     }
 
-    @GetMapping("/{id}")
-    public VideoResponse getVideoDetail(@PathVariable Long id) {
-        return videoService.getPublishedVideoDetail(id);
-    }
-
     @GetMapping("/latest")
     public List<VideoResponse> getLatest() {
         return videoService.getLatest();
@@ -35,5 +30,10 @@ public class VideoController {
     @GetMapping("/trending")
     public List<VideoResponse> getTrending() {
         return videoService.getTrending();
+    }
+
+    @GetMapping("/{id}")
+    public VideoResponse getVideoDetail(@PathVariable Long id) {
+        return videoService.getPublishedVideoDetail(id);
     }
 }
