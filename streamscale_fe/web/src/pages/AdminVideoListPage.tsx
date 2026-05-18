@@ -1,8 +1,22 @@
+import { isAxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { videoApi } from '../api/videoApi';
 import AppHeader from '../components/AppHeader';
 import type { Video, VideoStatus } from '../types/video';
+
+function loadVideosErrorMessage(err: unknown): string {
+  if (isAxiosError(err)) {
+    const status = err.response?.status;
+    if (status === 403) {
+      return 'Không tải được danh sách (403). Restart Spring Boot để nhận API mới, rồi đăng nhập lại bằng tài khoản ADMIN.';
+    }
+    if (status === 401) {
+      return 'Phiên đăng nhập hết hạn — hãy đăng xuất và đăng nhập lại.';
+    }
+  }
+  return 'Không tải được video. Kiểm tra backend đang chạy (port 8080) và thử lại.';
+}
 
 export default function AdminVideoListPage() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -16,7 +30,7 @@ export default function AdminVideoListPage() {
     videoApi
       .getAllAdmin()
       .then((res) => setVideos(res.data))
-      .catch(() => setError('Could not load videos'))
+      .catch((err) => setError(loadVideosErrorMessage(err)))
       .finally(() => setLoading(false));
   }, []);
 
@@ -71,8 +85,8 @@ export default function AdminVideoListPage() {
         {error && <p className="admin-page__error">{error}</p>}
         {loading && <p>Loading…</p>}
 
-        {!loading && videos.length === 0 && (
-          <p className="admin-page__empty">No videos yet.</p>
+        {!loading && !error && videos.length === 0 && (
+          <p className="admin-page__empty">Chưa có video nào.</p>
         )}
 
         {!loading && drafts.length > 0 && (

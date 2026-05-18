@@ -12,6 +12,7 @@ import com.micheal.streamscale.catalog.repository.GenreRepository;
 import com.micheal.streamscale.catalog.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +25,7 @@ public class VideoService {
     private final VideoRepository videoRepository;
     private final GenreRepository genreRepository;
 
+    @Transactional
     public VideoResponse create(VideoCreateRequest request) {
         Set<Genre> genres = getGenresByIds(request.genreIds());
 
@@ -42,6 +44,7 @@ public class VideoService {
         return toResponse(videoRepository.save(video));
     }
 
+    @Transactional
     public VideoResponse update(Long id, VideoUpdateRequest request) {
         Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Video not found"));
@@ -62,6 +65,7 @@ public class VideoService {
         return toResponse(videoRepository.save(video));
     }
 
+    @Transactional
     public void delete(Long id) {
         Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Video not found"));
@@ -69,6 +73,7 @@ public class VideoService {
         videoRepository.delete(video);
     }
 
+    @Transactional(readOnly = true)
     public List<VideoResponse> getAllForAdmin() {
         return videoRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
@@ -76,6 +81,7 @@ public class VideoService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<VideoResponse> getPublishedVideos() {
         return videoRepository.findByStatusOrderByCreatedAtDesc(VideoStatus.PUBLISHED)
                 .stream()
@@ -83,6 +89,7 @@ public class VideoService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public VideoResponse getPublishedVideoDetail(Long id) {
         Video video = videoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Video not found"));
@@ -94,6 +101,7 @@ public class VideoService {
         return toResponse(video);
     }
 
+    @Transactional(readOnly = true)
     public List<VideoResponse> getLatest() {
         return videoRepository.findTop10ByStatusOrderByCreatedAtDesc(VideoStatus.PUBLISHED)
                 .stream()
@@ -101,6 +109,7 @@ public class VideoService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<VideoResponse> getTrending() {
         return videoRepository.findTop10ByStatusOrderByReleaseYearDesc(VideoStatus.PUBLISHED)
                 .stream()
