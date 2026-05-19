@@ -19,6 +19,17 @@ spring:
       hibernate:
         format_sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
 jwt:
   secret: "streamscale-secret-key-streamscale-secret-key-123456789"
   expiration-ms: 86400000
+
+minio:
+  endpoint: http://localhost:9000
+  access-key: streamscale
+  secret-key: streamscale123
+  bucket: streamscale-videos

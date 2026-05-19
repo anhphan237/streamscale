@@ -64,6 +64,8 @@ export default function AdminVideoListPage() {
   };
 
   const drafts = videos.filter((v) => v.status === 'DRAFT');
+  const uploaded = videos.filter((v) => v.status === 'UPLOADED');
+  const ready = videos.filter((v) => v.status === 'READY');
   const published = videos.filter((v) => v.status === 'PUBLISHED');
 
   return (
@@ -72,14 +74,19 @@ export default function AdminVideoListPage() {
       <main className="admin-page admin-page--list">
         <div className="admin-page__toolbar">
           <h1>Manage videos</h1>
-          <Link to="/admin/videos/new" className="admin-page__link-btn">
-            + New video
-          </Link>
+          <div className="admin-page__toolbar-actions">
+            <Link to="/admin/videos/upload" className="admin-page__link-btn">
+              Upload MP4
+            </Link>
+            <Link to="/admin/videos/new" className="admin-page__link-btn">
+              + New video
+            </Link>
+          </div>
         </div>
 
         <p className="admin-page__hint">
-          <strong>Draft</strong> — chỉ admin thấy, không hiện trang chủ.{' '}
-          <strong>Published</strong> — hiện cho user trên home.
+          <strong>Draft</strong> — metadata thủ công. <strong>Uploaded</strong> — đã
+          có MP4 trên MinIO. <strong>Published</strong> — hiện cho user trên home.
         </p>
 
         {error && <p className="admin-page__error">{error}</p>}
@@ -95,6 +102,32 @@ export default function AdminVideoListPage() {
             <VideoAdminTable
               videos={drafts}
               actionId={actionId}
+              onPublish={(id) => setStatus(id, 'PUBLISHED')}
+              onDelete={remove}
+            />
+          </section>
+        )}
+
+        {!loading && uploaded.length > 0 && (
+          <section className="admin-table-section">
+            <h2>Uploaded ({uploaded.length})</h2>
+            <VideoAdminTable
+              videos={uploaded}
+              actionId={actionId}
+              showFile
+              onPublish={(id) => setStatus(id, 'PUBLISHED')}
+              onDelete={remove}
+            />
+          </section>
+        )}
+
+        {!loading && ready.length > 0 && (
+          <section className="admin-table-section">
+            <h2>Ready ({ready.length})</h2>
+            <VideoAdminTable
+              videos={ready}
+              actionId={actionId}
+              showFile
               onPublish={(id) => setStatus(id, 'PUBLISHED')}
               onDelete={remove}
             />
@@ -122,6 +155,7 @@ interface VideoAdminTableProps {
   videos: Video[];
   actionId: number | null;
   published?: boolean;
+  showFile?: boolean;
   onPublish?: (id: number) => void;
   onUnpublish?: (id: number) => void;
   onDelete: (id: number) => void;
@@ -131,6 +165,7 @@ function VideoAdminTable({
   videos,
   actionId,
   published,
+  showFile,
   onPublish,
   onUnpublish,
   onDelete,
@@ -143,6 +178,7 @@ function VideoAdminTable({
             <th>Title</th>
             <th>Type</th>
             <th>Status</th>
+            {showFile && <th>Source file</th>}
             <th>Actions</th>
           </tr>
         </thead>
@@ -158,6 +194,11 @@ function VideoAdminTable({
                   {video.status}
                 </span>
               </td>
+              {showFile && (
+                <td className="admin-table__file">
+                  {video.originalFileName ?? '—'}
+                </td>
+              )}
               <td className="admin-table__actions">
                 <Link
                   to={`/admin/videos/${video.id}/edit`}

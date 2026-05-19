@@ -8,9 +8,15 @@ const axiosClient = axios.create({
 });
 
 axiosClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const url = config.url ?? '';
+  const isPublicAuth =
+    url.includes('/api/auth/login') || url.includes('/api/auth/register');
+
+  if (!isPublicAuth) {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });

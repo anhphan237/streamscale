@@ -1,5 +1,5 @@
 export type VideoType = 'MOVIE' | 'SERIES';
-export type VideoStatus = 'DRAFT' | 'PUBLISHED';
+export type VideoStatus = 'DRAFT' | 'UPLOADED' | 'READY' | 'PUBLISHED';
 
 export interface Genre {
   id: number;
@@ -16,6 +16,9 @@ export interface Video {
   trailerUrl: string | null;
   durationSeconds: number | null;
   releaseYear: number | null;
+  originalFileUrl?: string | null;
+  originalFileName?: string | null;
+  originalFileSize?: number | null;
   genres: Genre[];
 }
 

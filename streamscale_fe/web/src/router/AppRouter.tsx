@@ -4,6 +4,7 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import AdminVideoCreatePage from '../pages/AdminVideoCreatePage';
 import AdminVideoEditPage from '../pages/AdminVideoEditPage';
 import AdminVideoListPage from '../pages/AdminVideoListPage';
+import AdminVideoUploadPage from '../pages/AdminVideoUploadPage';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import ProfileSelectionPage from '../pages/ProfileSelectionPage';
@@ -36,6 +37,7 @@ export default function AppRouter() {
         <Route element={<AdminRoute />}>
           <Route path="/admin/videos" element={<AdminVideoListPage />} />
           <Route path="/admin/videos/new" element={<AdminVideoCreatePage />} />
+          <Route path="/admin/videos/upload" element={<AdminVideoUploadPage />} />
           <Route path="/admin/videos/:id/edit" element={<AdminVideoEditPage />} />
         </Route>
 

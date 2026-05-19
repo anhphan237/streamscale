@@ -12,6 +12,9 @@ public record VideoResponse(
         String trailerUrl,
         Integer durationSeconds,
         Integer releaseYear,
+        String originalFileUrl,
+        String originalFileName,
+        Long originalFileSize,
         List<GenreResponse> genres
 ) {
 }

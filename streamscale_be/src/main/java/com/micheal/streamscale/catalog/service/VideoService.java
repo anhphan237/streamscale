@@ -167,6 +167,9 @@ public class VideoService {
                 video.getTrailerUrl(),
                 video.getDurationSeconds(),
                 video.getReleaseYear(),
+                video.getOriginalFileUrl(),
+                video.getOriginalFileName(),
+                video.getOriginalFileSize(),
                 genres
         );
     }

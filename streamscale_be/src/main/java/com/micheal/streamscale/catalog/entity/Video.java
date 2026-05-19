@@ -46,6 +46,18 @@ public class Video {
     @Column(name = "release_year")
     private Integer releaseYear;
 
+    @Column(name = "original_file_url", columnDefinition = "TEXT")
+    private String originalFileUrl;
+
+    @Column(name = "original_file_name")
+    private String originalFileName;
+
+    @Column(name = "original_content_type")
+    private String originalContentType;
+
+    @Column(name = "original_file_size")
+    private Long originalFileSize;
+
     @ManyToMany
     @JoinTable(
             name = "video_genres",

@@ -14,5 +14,20 @@ services:
     volumes:
       - streamscale_postgres_data:/var/lib/postgresql/data
 
+  minio:
+    image: minio/minio:latest
+    container_name: streamscale-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: streamscale
+      MINIO_ROOT_PASSWORD: streamscale123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - streamscale_minio_data:/data
+
 volumes:
   streamscale_postgres_data:
+  streamscale_minio_data:

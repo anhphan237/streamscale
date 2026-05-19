@@ -688,9 +688,33 @@ form {
   color: #ffc107;
 }
 
+.admin-badge--uploaded {
+  background: rgba(52, 152, 219, 0.2);
+  color: #3498db;
+}
+
+.admin-badge--ready {
+  background: rgba(155, 89, 182, 0.2);
+  color: #9b59b6;
+}
+
 .admin-badge--published {
   background: rgba(46, 204, 113, 0.2);
   color: #2ecc71;
+}
+
+.admin-page__toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin-table__file {
+  font-size: 0.85rem;
+  color: var(--text-muted, #aaa);
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 fieldset {
